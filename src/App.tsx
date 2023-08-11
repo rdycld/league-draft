@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, ElementRef, RefObject } from 'react';
 import { pick } from './utils/pick';
 import { drag, calcDrag } from './utils/drag';
 import { Rectangle } from './components/Rectangle';
-import { Direction, normalizeDotPosition } from './components/ResizeDot';
+import { Direction } from './components/ResizeDot';
 
 export type Shape = {
   x: number;
@@ -31,13 +31,25 @@ function App() {
 
     const onDrag = (event: PointerEvent) => {
       const travel = calcDrag(event, initialPoint);
+
+      const snapTop = currentShape.top + travel.y < containerBoundingRect.top ? 0 : undefined;
+      const snapRight =
+        currentShape.right + travel.x > containerBoundingRect.right
+          ? containerBoundingRect.width - currentShape.width
+          : undefined;
+      const snapBottom =
+        currentShape.bottom + travel.y > containerBoundingRect.bottom
+          ? containerBoundingRect.height - currentShape.height
+          : undefined;
+      const snapLeft = currentShape.left + travel.x < containerBoundingRect.left ? 0 : undefined;
+
       setShapes((p) =>
         p.map((shape, i) => {
           return i === index
             ? {
                 ...shape,
-                x: currentShape.x + travel.x - containerBoundingRect.x,
-                y: currentShape.y + travel.y - containerBoundingRect.y,
+                x: snapLeft ?? snapRight ?? currentShape.x + travel.x - containerBoundingRect.x,
+                y: snapTop ?? snapBottom ?? currentShape.y + travel.y - containerBoundingRect.y,
                 z: 2,
               }
             : { ...shape, z: 1 };
@@ -154,8 +166,8 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      height: rectangleBoundingRect.height + travel.y,
                       x: currentPoint.x + travel.x - containerBoundingRect.x,
+                      height: rectangleBoundingRect.height + travel.y,
                       width: rectangleBoundingRect.width - travel.x,
                     }
                   : shape;
@@ -169,8 +181,8 @@ function App() {
                   ? {
                       ...shape,
                       y: currentPoint.y + travel.y - containerBoundingRect.y,
-                      height: rectangleBoundingRect.height - travel.y,
                       x: currentPoint.x + travel.x - containerBoundingRect.x,
+                      height: rectangleBoundingRect.height - travel.y,
                       width: rectangleBoundingRect.width - travel.x,
                     }
                   : shape;
