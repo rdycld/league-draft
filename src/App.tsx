@@ -78,7 +78,7 @@ function App() {
                   ? {
                       ...shape,
                       y: currentPoint.y + travel.y - containerBoundingRect.y,
-                      height: rectangleBoundingRect.height - travel.y - containerBoundingRect.y,
+                      height: rectangleBoundingRect.height - travel.y,
                     }
                   : shape;
               }),
@@ -90,7 +90,7 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      width: rectangleBoundingRect.width + travel.x - containerBoundingRect.x,
+                      width: rectangleBoundingRect.width + travel.x,
                     }
                   : shape;
               }),
@@ -102,7 +102,7 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      height: rectangleBoundingRect.height + travel.y - containerBoundingRect.y,
+                      height: rectangleBoundingRect.height + travel.y,
                     }
                   : shape;
               }),
@@ -115,7 +115,7 @@ function App() {
                   ? {
                       ...shape,
                       x: currentPoint.x + travel.x - containerBoundingRect.x,
-                      width: rectangleBoundingRect.width - travel.x - containerBoundingRect.x,
+                      width: rectangleBoundingRect.width - travel.x,
                     }
                   : shape;
               }),
@@ -128,8 +128,8 @@ function App() {
                   ? {
                       ...shape,
                       y: currentPoint.y + travel.y - containerBoundingRect.y,
-                      height: rectangleBoundingRect.height - travel.y - containerBoundingRect.y,
-                      width: rectangleBoundingRect.width + travel.x - containerBoundingRect.x,
+                      height: rectangleBoundingRect.height - travel.y,
+                      width: rectangleBoundingRect.width + travel.x,
                     }
                   : shape;
               }),
@@ -141,8 +141,8 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      height: rectangleBoundingRect.height + travel.y - containerBoundingRect.y,
-                      width: rectangleBoundingRect.width + travel.x - containerBoundingRect.x,
+                      height: rectangleBoundingRect.height + travel.y,
+                      width: rectangleBoundingRect.width + travel.x,
                     }
                   : shape;
               }),
@@ -154,9 +154,9 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      height: rectangleBoundingRect.height + travel.y - containerBoundingRect.y,
+                      height: rectangleBoundingRect.height + travel.y,
                       x: currentPoint.x + travel.x - containerBoundingRect.x,
-                      width: rectangleBoundingRect.width - travel.x - containerBoundingRect.x,
+                      width: rectangleBoundingRect.width - travel.x,
                     }
                   : shape;
               }),
@@ -169,30 +169,16 @@ function App() {
                   ? {
                       ...shape,
                       y: currentPoint.y + travel.y - containerBoundingRect.y,
-                      height: rectangleBoundingRect.height - travel.y - containerBoundingRect.y,
+                      height: rectangleBoundingRect.height - travel.y,
                       x: currentPoint.x + travel.x - containerBoundingRect.x,
-                      width: rectangleBoundingRect.width - travel.x - containerBoundingRect.x,
+                      width: rectangleBoundingRect.width - travel.x,
                     }
                   : shape;
               }),
             );
             break;
-          case 'n':
-            setShapes((p) =>
-              p.map((shape, i) => {
-                return i === index
-                  ? {
-                      ...shape,
-                      y: currentPoint.y + travel.y - containerBoundingRect.y,
-                      height: rectangleBoundingRect.height - travel.y - containerBoundingRect.y,
-                    }
-                  : shape;
-              }),
-            );
-            break;
-
           default:
-            break;
+            throw new Error('shouldnt get there');
         }
       };
 
@@ -207,7 +193,13 @@ function App() {
     <>
       <div
         ref={containerRef}
-        style={{ width: 800, height: 800, position: 'relative', border: '1px solid black' }}
+        style={{
+          margin: 100,
+          width: 800,
+          height: 800,
+          position: 'relative',
+          border: '1px solid black',
+        }}
       >
         {shapes.map((shape, index) => (
           <Rectangle
