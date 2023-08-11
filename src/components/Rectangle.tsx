@@ -1,10 +1,16 @@
-import {  memo } from "react";
-import { Shape } from "../App";
-import { ResizeDot, placements } from "./ResizeDot";
+import React, { ElementRef, RefObject, memo, useRef } from 'react';
+import { Shape } from '../App';
+import { Direction, ResizeDot, directions } from './ResizeDot';
 
 export type Props = Shape & {
   index: number;
   onDrag: (event: React.MouseEvent<HTMLDivElement>, index: number) => void;
+  onResize: (
+    event: React.MouseEvent<HTMLSpanElement>,
+    rectangleRef: RefObject<HTMLDivElement>,
+    direction: Direction,
+    index: number,
+  ) => void;
 };
 
 export const Rectangle = memo(function Rectangle({
@@ -15,9 +21,21 @@ export const Rectangle = memo(function Rectangle({
   height,
   index,
   onDrag,
+  onResize,
 }: Props) {
+  const rectangleRef = useRef<ElementRef<'div'>>(null);
+
+  const handleResize = (event: React.MouseEvent<HTMLSpanElement>, direction: Direction) => {
+    event.stopPropagation();
+    if (!rectangleRef.current) {
+      return;
+    }
+    onResize(event, rectangleRef, direction, index);
+  };
+
   return (
     <div
+      ref={rectangleRef}
       onMouseDown={(e) => onDrag(e, index)}
       style={{
         userSelect: 'none',
@@ -32,7 +50,10 @@ export const Rectangle = memo(function Rectangle({
     >
       <p>top: {y}</p>
       <p>left: {x}</p>
-      {Object.keys(placements).map(key => <ResizeDot key={key} placement={key} />)}
+      <p>height: {height}</p>
+      {Object.keys(directions).map((key) => (
+        <ResizeDot key={key} direction={key} onDrag={handleResize} />
+      ))}
     </div>
   );
 });

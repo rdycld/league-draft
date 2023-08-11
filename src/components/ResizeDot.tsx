@@ -1,9 +1,9 @@
 import { CSSProperties, memo } from 'react';
 
-export type DotPlacement = 'ne' | 'n' | 'nw' | 'w' | 'sw' | 's' | 'se' | 'e';
+export type Direction = 'ne' | 'n' | 'nw' | 'w' | 'sw' | 's' | 'se' | 'e';
 
-export const placements: Record<
-  DotPlacement,
+export const directions: Record<
+  Direction,
   { top: `${number}%`; left: `${number}%`; cursor: CSSProperties['cursor'] }
 > = {
   n: { top: '0%', left: '50%', cursor: 'ns-resize' },
@@ -17,12 +17,14 @@ export const placements: Record<
 } as const;
 
 export type ResizeDotProps = {
-  placement: DotPlacement;
+  direction: Direction;
+  onDrag: (event: React.MouseEvent<HTMLSpanElement>, direction: Direction) => void;
 };
 
-export const ResizeDot = memo(({ placement }: ResizeDotProps) => {
+export const ResizeDot = memo(({ direction, onDrag }: ResizeDotProps) => {
   return (
     <span
+      onMouseDown={(e) => onDrag(e, direction)}
       style={{
         position: 'absolute',
         transform: 'translate(-50%, -50%)',
@@ -30,8 +32,13 @@ export const ResizeDot = memo(({ placement }: ResizeDotProps) => {
         height: 10,
         borderRadius: '50%',
         backgroundColor: 'lightblue',
-        ...placements[placement],
+
+        ...directions[direction],
       }}
     ></span>
   );
 });
+
+export function normalizeDotPosition(point: { clientX: number; clientY: number }) {
+  return { clientX: point.clientX - 5, clientY: point.clientY - 5 };
+}

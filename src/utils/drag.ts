@@ -11,8 +11,8 @@ export type DragOptions = {
   onClean?: () => void;
 };
 
-export function drag(
-  event: React.MouseEvent<HTMLDivElement>,
+export function drag<T extends HTMLElement>(
+  event: React.MouseEvent<T>,
   { onDragStart, onDrag, onClean }: DragOptions,
 ) {
   let cleaned = false;
