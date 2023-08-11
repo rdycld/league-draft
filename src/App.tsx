@@ -1,59 +1,21 @@
-import { useState, memo, MouseEvent, useCallback, useRef, ElementRef } from 'react';
+import { useState,  MouseEvent, useCallback, useRef, ElementRef } from 'react';
 import { pick } from './utils/pick';
 import { drag, calcDrag } from './utils/drag';
+import {  Rectangle } from './components/Rectangle';
 
-type Rectangle = {
+export type Shape = {
   x: number;
   y: number;
   z: number;
   width: number;
   height: number;
 };
-
-type RectangleProps = {
-  x: number;
-  y: number;
-  z: number;
-  width: number;
-  height: number;
-  index: number;
-  onDrag: (event: MouseEvent<HTMLDivElement>, index: number) => void;
-};
-
-const Rectangle = memo(function Rectangle({
-  x,
-  y,
-  z,
-  width,
-  height,
-  index,
-  onDrag,
-}: RectangleProps) {
-  return (
-    <div
-      onMouseDown={(e) => onDrag(e, index)}
-      style={{
-        userSelect: 'none',
-        width,
-        height,
-        top: y,
-        left: x,
-        zIndex: z,
-        position: 'absolute',
-        border: '1px solid black',
-      }}
-    >
-      <p>top: {y}</p>
-      <p>left: {x}</p>
-    </div>
-  );
-});
 
 function App() {
-  const [shapes, setShapes] = useState<Rectangle[]>([]);
+  const [shapes, setShapes] = useState<Shape[]>([]);
   const containerRef = useRef<ElementRef<'div'>>(null);
 
-  const addRect = () => {
+  const addShape = () => {
     setShapes((p) => [...p, { x: 0, y: 0, z: p.length + 1, width: 200, height: 200 }]);
   };
 
@@ -97,8 +59,7 @@ function App() {
           <Rectangle key={index} {...shape} index={index} onDrag={handleDrag} />
         ))}
       </div>
-      hihi
-      <button onClick={addRect}>add rect</button>
+      <button onClick={addShape}>add rect</button>
     </>
   );
 }

@@ -51,7 +51,6 @@ export function drag(
 
     if (dragging) {
       dragging = false;
-      // document.head.removeChild(style);
       // onDragEnd?.();
     }
 
