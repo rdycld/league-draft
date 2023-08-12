@@ -19,13 +19,15 @@ export const directions: Record<
 export type ResizeDotProps = {
   direction: Direction;
   onDrag: (event: React.MouseEvent<HTMLSpanElement>, direction: Direction) => void;
+  visible: boolean;
 };
 
-export const ResizeDot = memo(({ direction, onDrag }: ResizeDotProps) => {
+export const ResizeDot = memo(({ direction, onDrag, visible }: ResizeDotProps) => {
   return (
     <span
       onMouseDown={(e) => onDrag(e, direction)}
       style={{
+        display: visible ? 'inline' : 'none',
         position: 'absolute',
         transform: 'translate(-50%, -50%)',
         width: 10,
@@ -38,7 +40,3 @@ export const ResizeDot = memo(({ direction, onDrag }: ResizeDotProps) => {
     ></span>
   );
 });
-
-export function normalizeDotPosition(point: { clientX: number; clientY: number }) {
-  return { clientX: point.clientX - 5, clientY: point.clientY - 5 };
-}

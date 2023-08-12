@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, ElementRef, RefObject } from 'react';
 import { pick } from './utils/pick';
-import { drag, calcDrag } from './utils/drag';
+import { drag, calcDrag, DragOptions, snapToEdge } from './utils/drag';
 import { Rectangle } from './components/Rectangle';
 import { Direction } from './components/ResizeDot';
 
@@ -10,6 +10,7 @@ export type Shape = {
   z: number;
   width: number;
   height: number;
+  selected: boolean;
 };
 
 function App() {
@@ -17,50 +18,48 @@ function App() {
   const containerRef = useRef<ElementRef<'div'>>(null);
 
   const addShape = () => {
-    setShapes((p) => [...p, { x: 0, y: 0, z: p.length + 1, width: 200, height: 200 }]);
+    setShapes((p) => [
+      ...p,
+      { x: 0, y: 0, z: p.length + 1, width: 200, height: 200, selected: true },
+    ]);
   };
 
-  const handleDrag = useCallback((event: React.MouseEvent<HTMLDivElement>, index: number) => {
-    if (!containerRef.current) {
-      return;
-    }
+  const handleDrag = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>, index: number, options?: DragOptions) => {
+      if (!containerRef.current) {
+        return;
+      }
 
-    const currentShape = event.currentTarget.getBoundingClientRect();
-    const containerBoundingRect = containerRef.current.getBoundingClientRect();
-    const initialPoint = pick(event, ['clientX', 'clientY']);
+      const currentShape = event.currentTarget.getBoundingClientRect();
+      const containerBoundingRect = containerRef.current.getBoundingClientRect();
+      const initialPoint = pick(event, ['clientX', 'clientY']);
 
-    const onDrag = (event: PointerEvent) => {
-      const travel = calcDrag(event, initialPoint);
+      const onDrag = (event: PointerEvent) => {
+        const travel = calcDrag(event, initialPoint);
 
-      const snapTop = currentShape.top + travel.y < containerBoundingRect.top ? 0 : undefined;
-      const snapRight =
-        currentShape.right + travel.x > containerBoundingRect.right
-          ? containerBoundingRect.width - currentShape.width
-          : undefined;
-      const snapBottom =
-        currentShape.bottom + travel.y > containerBoundingRect.bottom
-          ? containerBoundingRect.height - currentShape.height
-          : undefined;
-      const snapLeft = currentShape.left + travel.x < containerBoundingRect.left ? 0 : undefined;
+        const { snapX, snapY } = snapToEdge(currentShape, containerBoundingRect, travel);
 
-      setShapes((p) =>
-        p.map((shape, i) => {
-          return i === index
-            ? {
-                ...shape,
-                x: snapLeft ?? snapRight ?? currentShape.x + travel.x - containerBoundingRect.x,
-                y: snapTop ?? snapBottom ?? currentShape.y + travel.y - containerBoundingRect.y,
-                z: 2,
-              }
-            : { ...shape, z: 1 };
-        }),
-      );
-    };
+        setShapes((p) =>
+          p.map((shape, i) => {
+            return i === index
+              ? {
+                  ...shape,
+                  x: snapX ?? currentShape.x + travel.x - containerBoundingRect.x,
+                  y: snapY ?? currentShape.y + travel.y - containerBoundingRect.y,
+                  z: 2,
+                }
+              : { ...shape, z: 1 };
+          }),
+        );
+      };
 
-    drag(event, {
-      onDrag,
-    });
-  }, []);
+      drag(event, {
+        onDrag,
+        ...options,
+      });
+    },
+    [],
+  );
 
   const handleResize = useCallback(
     (
@@ -82,6 +81,12 @@ function App() {
       const onDrag = (event: PointerEvent) => {
         const travel = calcDrag(event, initialPoint);
 
+        const { snapTop, snapRight, snapBottom, snapLeft } = snapToEdge(
+          currentPoint,
+          containerBoundingRect,
+          travel,
+        );
+
         switch (direction) {
           case 'n':
             setShapes((p) =>
@@ -89,8 +94,10 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      y: currentPoint.y + travel.y - containerBoundingRect.y,
-                      height: rectangleBoundingRect.height - travel.y,
+                      y: snapTop ? 0 : currentPoint.y + travel.y - containerBoundingRect.y,
+                      height: snapTop
+                        ? rectangleBoundingRect.bottom - containerBoundingRect.y
+                        : rectangleBoundingRect.height - travel.y,
                     }
                   : shape;
               }),
@@ -102,7 +109,9 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      width: rectangleBoundingRect.width + travel.x,
+                      width: snapRight
+                        ? containerBoundingRect.width - shape.x
+                        : rectangleBoundingRect.width + travel.x,
                     }
                   : shape;
               }),
@@ -114,7 +123,9 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      height: rectangleBoundingRect.height + travel.y,
+                      height: snapBottom
+                        ? containerBoundingRect.height - shape.y
+                        : rectangleBoundingRect.height + travel.y,
                     }
                   : shape;
               }),
@@ -126,8 +137,10 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      x: currentPoint.x + travel.x - containerBoundingRect.x,
-                      width: rectangleBoundingRect.width - travel.x,
+                      x: snapLeft ? 0 : currentPoint.x + travel.x - containerBoundingRect.x,
+                      width: snapLeft
+                        ? rectangleBoundingRect.right - containerBoundingRect.x
+                        : rectangleBoundingRect.width - travel.x,
                     }
                   : shape;
               }),
@@ -139,9 +152,13 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      y: currentPoint.y + travel.y - containerBoundingRect.y,
-                      height: rectangleBoundingRect.height - travel.y,
-                      width: rectangleBoundingRect.width + travel.x,
+                      y: snapTop ? 0 : currentPoint.y + travel.y - containerBoundingRect.y,
+                      height: snapTop
+                        ? rectangleBoundingRect.bottom - containerBoundingRect.y
+                        : rectangleBoundingRect.height - travel.y,
+                      width: snapRight
+                        ? containerBoundingRect.width - shape.x
+                        : rectangleBoundingRect.width + travel.x,
                     }
                   : shape;
               }),
@@ -153,8 +170,12 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      height: rectangleBoundingRect.height + travel.y,
-                      width: rectangleBoundingRect.width + travel.x,
+                      height: snapBottom
+                        ? containerBoundingRect.height - shape.y
+                        : rectangleBoundingRect.height + travel.y,
+                      width: snapRight
+                        ? containerBoundingRect.width - shape.x
+                        : rectangleBoundingRect.width + travel.x,
                     }
                   : shape;
               }),
@@ -166,9 +187,13 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      x: currentPoint.x + travel.x - containerBoundingRect.x,
-                      height: rectangleBoundingRect.height + travel.y,
-                      width: rectangleBoundingRect.width - travel.x,
+                      x: snapLeft ? 0 : currentPoint.x + travel.x - containerBoundingRect.x,
+                      width: snapLeft
+                        ? rectangleBoundingRect.right - containerBoundingRect.x
+                        : rectangleBoundingRect.width - travel.x,
+                      height: snapBottom
+                        ? containerBoundingRect.height - shape.y
+                        : rectangleBoundingRect.height + travel.y,
                     }
                   : shape;
               }),
@@ -180,10 +205,14 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      y: currentPoint.y + travel.y - containerBoundingRect.y,
-                      x: currentPoint.x + travel.x - containerBoundingRect.x,
-                      height: rectangleBoundingRect.height - travel.y,
-                      width: rectangleBoundingRect.width - travel.x,
+                      y: snapTop ? 0 : currentPoint.y + travel.y - containerBoundingRect.y,
+                      height: snapTop
+                        ? rectangleBoundingRect.bottom - containerBoundingRect.y
+                        : rectangleBoundingRect.height - travel.y,
+                      x: snapLeft ? 0 : currentPoint.x + travel.x - containerBoundingRect.x,
+                      width: snapLeft
+                        ? rectangleBoundingRect.right - containerBoundingRect.x
+                        : rectangleBoundingRect.width - travel.x,
                     }
                   : shape;
               }),

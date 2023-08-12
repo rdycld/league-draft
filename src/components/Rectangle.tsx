@@ -22,6 +22,7 @@ export const Rectangle = memo(function Rectangle({
   index,
   onDrag,
   onResize,
+  selected,
 }: Props) {
   const rectangleRef = useRef<ElementRef<'div'>>(null);
 
@@ -50,9 +51,9 @@ export const Rectangle = memo(function Rectangle({
     >
       <p>top: {y}</p>
       <p>left: {x}</p>
-      <p>height: {height}</p>
+      <p>selected: {'' + selected}</p>
       {Object.keys(directions).map((key) => (
-        <ResizeDot key={key} direction={key} onDrag={handleResize} />
+        <ResizeDot key={key} direction={key} visible={selected} onDrag={handleResize} />
       ))}
     </div>
   );

@@ -76,3 +76,20 @@ function getDistance(
 ) {
   return ((point1.clientX - point2.clientX) ** 2 + (point1.clientY - point2.clientY) ** 2) ** 0.5;
 }
+
+export function snapToEdge(element: DOMRect, container: DOMRect, drag: { x: number; y: number }) {
+  const snapTop = element.top + drag.y < container.top;
+  const snapRight = element.right + drag.x > container.right;
+  const snapBottom = element.bottom + drag.y > container.bottom;
+  const snapLeft = element.left + drag.x < container.left;
+
+  const top = snapTop ? 0 : undefined;
+  const bottom = snapBottom ? container.height - element.height : undefined;
+  const snapY = top ?? bottom;
+
+  const left = snapLeft ? 0 : undefined;
+  const right = snapRight ? container.width - element.width : undefined;
+  const snapX = left ?? right;
+
+  return { snapTop, snapRight, snapBottom, snapLeft, snapY, snapX };
+}
