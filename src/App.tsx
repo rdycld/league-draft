@@ -72,17 +72,15 @@ function App() {
         return;
       }
 
-      const currentPoint = event.currentTarget.getBoundingClientRect();
+      const initialPoint = pick(event, ['clientX', 'clientY']);
       const rectangleBoundingRect = rectangleRef.current!.getBoundingClientRect();
       const containerBoundingRect = containerRef.current.getBoundingClientRect();
-
-      const initialPoint = pick(event, ['clientX', 'clientY']);
 
       const onDrag = (event: PointerEvent) => {
         const travel = calcDrag(event, initialPoint);
 
         const { snapTop, snapRight, snapBottom, snapLeft } = snapToEdge(
-          currentPoint,
+          rectangleBoundingRect,
           containerBoundingRect,
           travel,
         );
@@ -94,7 +92,7 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      y: snapTop ? 0 : currentPoint.y + travel.y - containerBoundingRect.y,
+                      y: snapTop ? 0 : rectangleBoundingRect.y + travel.y - containerBoundingRect.y,
                       height: snapTop
                         ? rectangleBoundingRect.bottom - containerBoundingRect.y
                         : rectangleBoundingRect.height - travel.y,
@@ -137,7 +135,9 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      x: snapLeft ? 0 : currentPoint.x + travel.x - containerBoundingRect.x,
+                      x: snapLeft
+                        ? 0
+                        : rectangleBoundingRect.x + travel.x - containerBoundingRect.x,
                       width: snapLeft
                         ? rectangleBoundingRect.right - containerBoundingRect.x
                         : rectangleBoundingRect.width - travel.x,
@@ -152,7 +152,7 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      y: snapTop ? 0 : currentPoint.y + travel.y - containerBoundingRect.y,
+                      y: snapTop ? 0 : rectangleBoundingRect.y + travel.y - containerBoundingRect.y,
                       height: snapTop
                         ? rectangleBoundingRect.bottom - containerBoundingRect.y
                         : rectangleBoundingRect.height - travel.y,
@@ -187,7 +187,9 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      x: snapLeft ? 0 : currentPoint.x + travel.x - containerBoundingRect.x,
+                      x: snapLeft
+                        ? 0
+                        : rectangleBoundingRect.x + travel.x - containerBoundingRect.x,
                       width: snapLeft
                         ? rectangleBoundingRect.right - containerBoundingRect.x
                         : rectangleBoundingRect.width - travel.x,
@@ -205,11 +207,13 @@ function App() {
                 return i === index
                   ? {
                       ...shape,
-                      y: snapTop ? 0 : currentPoint.y + travel.y - containerBoundingRect.y,
+                      y: snapTop ? 0 : rectangleBoundingRect.y + travel.y - containerBoundingRect.y,
                       height: snapTop
                         ? rectangleBoundingRect.bottom - containerBoundingRect.y
                         : rectangleBoundingRect.height - travel.y,
-                      x: snapLeft ? 0 : currentPoint.x + travel.x - containerBoundingRect.x,
+                      x: snapLeft
+                        ? 0
+                        : rectangleBoundingRect.x + travel.x - containerBoundingRect.x,
                       width: snapLeft
                         ? rectangleBoundingRect.right - containerBoundingRect.x
                         : rectangleBoundingRect.width - travel.x,
