@@ -31,10 +31,10 @@ export const Slot = memo(function Slot(props: Props) {
 
     //checks for illegal actions {}
     if (props.id) {
-      //on realease
+      //todo fix Prop types
+      onRelease(type, id!);
     } else {
       onAssign(type, index);
-      //on assign
     }
   };
 

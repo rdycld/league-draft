@@ -50,35 +50,38 @@ export function Draft() {
     undefined,
   ]);
 
-  const handleReleaseChampFromSlot = (type: SlotType, id: ID) => {
+  const cleanSelectedChamp = useCallback(() => {
+    setSelectedChamp(undefined);
+  }, []);
+
+  const handleReleaseChampFromSlot = useCallback((type: SlotType, id: ID) => {
     switch (type) {
       case 'redBan':
-        setRedBans((p) => p.map((slot) => (slot === id ? undefined : slot)) as Bans);
+        setRedBans((p) => releaseSlot(p, id));
         break;
       case 'blueBan':
-        setBlueBans((p) => p.map((slot) => (slot === id ? undefined : slot)) as Bans);
+        setBlueBans((p) => releaseSlot(p, id));
         break;
       case 'redPick':
-        setRedPicks((p) => p.map((slot) => (slot === id ? undefined : slot)) as Picks);
+        setRedPicks((p) => releaseSlot(p, id));
         break;
       case 'bluePick':
-        setBluePicks((p) => p.map((slot) => (slot === id ? undefined : slot)) as Picks);
+        setBluePicks((p) => releaseSlot(p, id));
         break;
       case 'pool':
         break;
       default:
         throw new Error('shouldnt get there');
     }
-    setPool((p) => p.map((champ) => (champ.id === id ? { ...champ, selected: false } : champ)));
-  };
 
-  const cleanSelectedChamp = useCallback(() => {
-    setSelectedChamp(undefined);
+    setPool((p) => p.map((champ) => (champ.id === id ? { ...champ, assigned: false } : champ)));
   }, []);
 
   const handleAssignChampToSlot = useCallback(
     (type: SlotType, index: number, id?: ID) => {
       //tbf feels hacky xD
+      // better slot props type should fix issue
+      // but for now it works :D
       if (!id) {
         //todo add assert helper
         throw new Error('yikes');
@@ -86,16 +89,16 @@ export function Draft() {
 
       switch (type) {
         case 'redBan':
-          setRedBans((p) => p.map((slot, idx) => (idx === index ? id : slot)) as Bans);
+          setRedBans((p) => assignToSlot(p, index, id));
           break;
         case 'blueBan':
-          setBlueBans((p) => p.map((slot, idx) => (idx === index ? id : slot)) as Bans);
+          setBlueBans((p) => assignToSlot(p, index, id));
           break;
         case 'redPick':
-          setRedPicks((p) => p.map((slot, idx) => (idx === index ? id : slot)) as Picks);
+          setRedPicks((p) => assignToSlot(p, index, id));
           break;
         case 'bluePick':
-          setBluePicks((p) => p.map((slot, idx) => (idx === index ? id : slot)) as Picks);
+          setBluePicks((p) => assignToSlot(p, index, id));
           break;
         case 'pool':
           break;
@@ -118,7 +121,7 @@ export function Draft() {
       <div
         style={{
           display: 'flex',
-          flexGrow: 2,
+          flexGrow: 3,
           backgroundColor: 'blue',
           flexDirection: 'column',
         }}
@@ -178,7 +181,16 @@ export function Draft() {
               rowGap: '15px',
             }}
           >
-            blue picks
+            {bluePicks.map((slot, index) => (
+              <Slot
+                key={index}
+                id={slot}
+                index={index}
+                onAssign={(type, index) => handleAssignChampToSlot(type, index, selectedChamp)}
+                onRelease={handleReleaseChampFromSlot}
+                type="bluePick"
+              />
+            ))}
           </div>
           <div>
             {pool.map((champ) => (
@@ -198,14 +210,23 @@ export function Draft() {
               flexDirection: 'column',
             }}
           >
-            red picks
+            {redPicks.map((slot, index) => (
+              <Slot
+                key={index}
+                id={slot}
+                index={index}
+                onAssign={(type, index) => handleAssignChampToSlot(type, index, selectedChamp)}
+                onRelease={handleReleaseChampFromSlot}
+                type="redPick"
+              />
+            ))}
           </div>
         </div>
       </div>
       <div
         style={{
           display: 'flex',
-          flexGrow: 1,
+          flexGrow: 2,
         }}
       >
         summoners rift
@@ -213,6 +234,15 @@ export function Draft() {
     </div>
   );
 }
+
+function releaseSlot<T extends Picks | Bans>(slots: T, id: ID) {
+  return slots.map((slot) => (slot === id ? undefined : slot)) as T;
+}
+
+function assignToSlot<T extends Picks | Bans>(slots: T, index: number, id: ID) {
+  return slots.map((slot, idx) => (idx === index ? id : slot)) as T;
+}
+
 const dummyPool = [
   {
     name: 'aatrox',
