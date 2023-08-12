@@ -4,6 +4,7 @@ import { drag, calcDrag, DragOptions, snapToEdge } from './utils/drag';
 import { Rectangle } from './components/Rectangle';
 import { Direction } from './components/ResizeDot';
 import { getResizeDimensions } from './utils/getResizeDimensions';
+import { getDragCoordinates } from './utils/getDragCoordinates';
 
 export type Shape = {
   x: number;
@@ -31,22 +32,21 @@ function App() {
         return;
       }
 
-      const currentShape = event.currentTarget.getBoundingClientRect();
-      const containerBoundingRect = containerRef.current.getBoundingClientRect();
+      const rectangle = event.currentTarget.getBoundingClientRect();
+      const container = containerRef.current.getBoundingClientRect();
       const initialPoint = pick(event, ['clientX', 'clientY']);
 
       const onDrag = (event: PointerEvent) => {
-        const travel = calcDrag(event, initialPoint);
+        const drag = calcDrag(event, initialPoint);
 
-        const { snapX, snapY } = snapToEdge(currentShape, containerBoundingRect, travel);
+        const coordinates = getDragCoordinates(rectangle, container, drag);
 
         setShapes((p) =>
           p.map((shape, i) => {
             return i === index
               ? {
                   ...shape,
-                  x: snapX ?? currentShape.x + travel.x - containerBoundingRect.x,
-                  y: snapY ?? currentShape.y + travel.y - containerBoundingRect.y,
+                  ...coordinates,
                   z: 2,
                 }
               : { ...shape, z: 1 };
@@ -74,18 +74,13 @@ function App() {
       }
 
       const initialPoint = pick(event, ['clientX', 'clientY']);
-      const rectangleBoundingRect = rectangleRef.current!.getBoundingClientRect();
-      const containerBoundingRect = containerRef.current.getBoundingClientRect();
+      const rectangle = rectangleRef.current!.getBoundingClientRect();
+      const container = containerRef.current.getBoundingClientRect();
 
       const onDrag = (event: PointerEvent) => {
-        const travel = calcDrag(event, initialPoint);
+        const drag = calcDrag(event, initialPoint);
 
-        const dimensios = getResizeDimensions(
-          rectangleBoundingRect,
-          containerBoundingRect,
-          travel,
-          direction,
-        );
+        const dimensios = getResizeDimensions(rectangle, container, drag, direction);
 
         setShapes((p) =>
           p.map((shape, i) => {
