@@ -77,6 +77,15 @@ function getDistance(
   return ((point1.clientX - point2.clientX) ** 2 + (point1.clientY - point2.clientY) ** 2) ** 0.5;
 }
 
+export type Snap = {
+  snapTop: boolean;
+  snapRight: boolean;
+  snapBottom: boolean;
+  snapLeft: boolean;
+};
+
+//todo remove snapY and snapX - they are drag dimensions
+//or change them to snap in both directions
 export function snapToEdge(element: DOMRect, container: DOMRect, drag: { x: number; y: number }) {
   const snapTop = element.top + drag.y < container.top;
   const snapRight = element.right + drag.x > container.right;

@@ -3,6 +3,7 @@ import { pick } from './utils/pick';
 import { drag, calcDrag, DragOptions, snapToEdge } from './utils/drag';
 import { Rectangle } from './components/Rectangle';
 import { Direction } from './components/ResizeDot';
+import { getResizeDimensions } from './utils/getResizeDimensions';
 
 export type Shape = {
   x: number;
@@ -79,152 +80,23 @@ function App() {
       const onDrag = (event: PointerEvent) => {
         const travel = calcDrag(event, initialPoint);
 
-        const { snapTop, snapRight, snapBottom, snapLeft } = snapToEdge(
+        const dimensios = getResizeDimensions(
           rectangleBoundingRect,
           containerBoundingRect,
           travel,
+          direction,
         );
 
-        switch (direction) {
-          case 'n':
-            setShapes((p) =>
-              p.map((shape, i) => {
-                return i === index
-                  ? {
-                      ...shape,
-                      y: snapTop ? 0 : rectangleBoundingRect.y + travel.y - containerBoundingRect.y,
-                      height: snapTop
-                        ? rectangleBoundingRect.bottom - containerBoundingRect.y
-                        : rectangleBoundingRect.height - travel.y,
-                    }
-                  : shape;
-              }),
-            );
-            break;
-          case 'w':
-            setShapes((p) =>
-              p.map((shape, i) => {
-                return i === index
-                  ? {
-                      ...shape,
-                      width: snapRight
-                        ? containerBoundingRect.width - shape.x
-                        : rectangleBoundingRect.width + travel.x,
-                    }
-                  : shape;
-              }),
-            );
-            break;
-          case 's':
-            setShapes((p) =>
-              p.map((shape, i) => {
-                return i === index
-                  ? {
-                      ...shape,
-                      height: snapBottom
-                        ? containerBoundingRect.height - shape.y
-                        : rectangleBoundingRect.height + travel.y,
-                    }
-                  : shape;
-              }),
-            );
-            break;
-          case 'e':
-            setShapes((p) =>
-              p.map((shape, i) => {
-                return i === index
-                  ? {
-                      ...shape,
-                      x: snapLeft
-                        ? 0
-                        : rectangleBoundingRect.x + travel.x - containerBoundingRect.x,
-                      width: snapLeft
-                        ? rectangleBoundingRect.right - containerBoundingRect.x
-                        : rectangleBoundingRect.width - travel.x,
-                    }
-                  : shape;
-              }),
-            );
-            break;
-          case 'nw':
-            setShapes((p) =>
-              p.map((shape, i) => {
-                return i === index
-                  ? {
-                      ...shape,
-                      y: snapTop ? 0 : rectangleBoundingRect.y + travel.y - containerBoundingRect.y,
-                      height: snapTop
-                        ? rectangleBoundingRect.bottom - containerBoundingRect.y
-                        : rectangleBoundingRect.height - travel.y,
-                      width: snapRight
-                        ? containerBoundingRect.width - shape.x
-                        : rectangleBoundingRect.width + travel.x,
-                    }
-                  : shape;
-              }),
-            );
-            break;
-          case 'sw':
-            setShapes((p) =>
-              p.map((shape, i) => {
-                return i === index
-                  ? {
-                      ...shape,
-                      height: snapBottom
-                        ? containerBoundingRect.height - shape.y
-                        : rectangleBoundingRect.height + travel.y,
-                      width: snapRight
-                        ? containerBoundingRect.width - shape.x
-                        : rectangleBoundingRect.width + travel.x,
-                    }
-                  : shape;
-              }),
-            );
-            break;
-          case 'se':
-            setShapes((p) =>
-              p.map((shape, i) => {
-                return i === index
-                  ? {
-                      ...shape,
-                      x: snapLeft
-                        ? 0
-                        : rectangleBoundingRect.x + travel.x - containerBoundingRect.x,
-                      width: snapLeft
-                        ? rectangleBoundingRect.right - containerBoundingRect.x
-                        : rectangleBoundingRect.width - travel.x,
-                      height: snapBottom
-                        ? containerBoundingRect.height - shape.y
-                        : rectangleBoundingRect.height + travel.y,
-                    }
-                  : shape;
-              }),
-            );
-            break;
-          case 'ne':
-            setShapes((p) =>
-              p.map((shape, i) => {
-                return i === index
-                  ? {
-                      ...shape,
-                      y: snapTop ? 0 : rectangleBoundingRect.y + travel.y - containerBoundingRect.y,
-                      height: snapTop
-                        ? rectangleBoundingRect.bottom - containerBoundingRect.y
-                        : rectangleBoundingRect.height - travel.y,
-                      x: snapLeft
-                        ? 0
-                        : rectangleBoundingRect.x + travel.x - containerBoundingRect.x,
-                      width: snapLeft
-                        ? rectangleBoundingRect.right - containerBoundingRect.x
-                        : rectangleBoundingRect.width - travel.x,
-                    }
-                  : shape;
-              }),
-            );
-            break;
-          default:
-            throw new Error('shouldnt get there');
-        }
+        setShapes((p) =>
+          p.map((shape, i) => {
+            return i === index
+              ? {
+                  ...shape,
+                  ...dimensios,
+                }
+              : shape;
+          }),
+        );
       };
 
       drag(event, {
