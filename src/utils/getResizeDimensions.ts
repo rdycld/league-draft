@@ -24,7 +24,7 @@ export function getResizeDimensions(
     case 's':
       return { height: sResizeHeight };
     case 'e':
-      return { height: sResizeHeight, width: eResizeWidth };
+      return { x, width: eResizeWidth };
     case 'ne':
       return { y, x, height: nResizeHeight, width: eResizeWidth };
     case 'nw':

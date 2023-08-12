@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, ElementRef, RefObject } from 'react';
 import { pick } from './utils/pick';
-import { drag, calcDrag, DragOptions, snapToEdge } from './utils/drag';
+import { drag, calcDrag, DragOptions } from './utils/drag';
 import { Rectangle } from './components/Rectangle';
 import { Direction } from './components/ResizeDot';
 import { getResizeDimensions } from './utils/getResizeDimensions';
