@@ -1,3 +1,4 @@
+import { CSSProperties } from 'react';
 import { pick } from './pick';
 
 export type DragOptions = {
@@ -10,14 +11,19 @@ export type DragOptions = {
   onDragEnd?: () => void;
   onClean?: () => void;
   dragThresholdPx?: number;
+  cursor?: CSSProperties['cursor'];
 };
 
 export function drag<T extends HTMLElement>(
   event: React.MouseEvent<T>,
-  { onDragStart, onDrag, onClean, dragThresholdPx = 5 }: DragOptions,
+  { onDragStart, onDrag, onClean, dragThresholdPx = 5, cursor = 'move' }: DragOptions,
 ) {
   let cleaned = false;
   let dragging = false;
+
+  const style = document.createElement('style');
+  style.innerHTML = `* { cursor:${cursor}}`;
+  document.head.appendChild(style);
 
   const { currentTarget } = event;
 
@@ -49,6 +55,7 @@ export function drag<T extends HTMLElement>(
 
     cleaned = true;
     onClean?.();
+    document.head.removeChild(style);
 
     if (dragging) {
       dragging = false;

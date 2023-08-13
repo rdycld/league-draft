@@ -14,7 +14,7 @@ type DupaProps = Coordinates & {
   onDrag: (event: React.MouseEvent<HTMLDivElement>, index: ID) => void;
 };
 
-const Dupa = memo(function Icon({ id, onDrag, x, y }: DupaProps) {
+const Champ = memo(function Champ({ id, onDrag, x, y }: DupaProps) {
   const rectangleRef = useRef<ElementRef<'div'>>(null);
 
   return (
@@ -24,19 +24,19 @@ const Dupa = memo(function Icon({ id, onDrag, x, y }: DupaProps) {
         top: y,
         left: x,
         position: 'absolute',
-        border: '5px solid black',
+        border: '2px solid black',
         width: 50,
         height: 50,
         borderRadius: '50%',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundImage: 'url(https://picsum.photos/50)',
+        cursor: 'move',
       }}
       ref={rectangleRef}
       onMouseDown={(e) => onDrag(e, id)}
-    >
-      {id}
-    </div>
+    ></div>
   );
 });
 
@@ -101,10 +101,12 @@ export function SummonersRift({ redPicks, bluePicks }: Props) {
         height: 800,
         border: '1px solid black',
         position: 'relative',
+        backgroundImage: 'url(/summoners_rift.png)',
+        backgroundSize: 'contain',
       }}
     >
       {picks.map((pick) => (
-        <Dupa key={pick.id} onDrag={handleDrag} {...pick} />
+        <Champ key={pick.id} onDrag={handleDrag} {...pick} />
       ))}
     </div>
   );

@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { Slot, SlotType } from '../components/Slot';
 import { SummonersRift } from '../components/SummonnersRift';
+import { Draft } from '../components/Draft';
 
 export type ID = Brand<number, 'id'>;
 
@@ -17,7 +18,7 @@ type Pick = Brand<number, 'id'> | undefined;
 export type Picks = [Pick, Pick, Pick, Pick, Pick];
 type Bans = [Ban, Ban, Ban, Ban, Ban];
 
-export function Draft() {
+export function DraftPage() {
   const [pool, setPool] = useState<DraftChamp[]>(dummyPool);
   const [selectedChamp, setSelectedChamp] = useState<ID>();
 
@@ -51,10 +52,6 @@ export function Draft() {
     undefined,
   ]);
 
-  const cleanSelectedChamp = useCallback(() => {
-    setSelectedChamp(undefined);
-  }, []);
-
   const handleReleaseChampFromSlot = useCallback((type: SlotType, id: ID) => {
     switch (type) {
       case 'redBan':
@@ -79,23 +76,23 @@ export function Draft() {
   }, []);
 
   const handleAssignChampToSlot = useCallback(
-    (type: SlotType, index: number, id?: ID) => {
-      if (!id) {
+    (type: SlotType, index: number) => {
+      if (!selectedChamp) {
         return;
       }
 
       switch (type) {
         case 'redBan':
-          setRedBans((p) => assignToSlot(p, index, id));
+          setRedBans((p) => assignToSlot(p, index, selectedChamp));
           break;
         case 'blueBan':
-          setBlueBans((p) => assignToSlot(p, index, id));
+          setBlueBans((p) => assignToSlot(p, index, selectedChamp));
           break;
         case 'redPick':
-          setRedPicks((p) => assignToSlot(p, index, id));
+          setRedPicks((p) => assignToSlot(p, index, selectedChamp));
           break;
         case 'bluePick':
-          setBluePicks((p) => assignToSlot(p, index, id));
+          setBluePicks((p) => assignToSlot(p, index, selectedChamp));
           break;
         case 'pool':
           break;
@@ -103,10 +100,13 @@ export function Draft() {
           throw new Error('shouldnt get there');
       }
 
-      setPool((p) => p.map((champ) => (champ.id === id ? { ...champ, assigned: true } : champ)));
-      cleanSelectedChamp();
+      setPool((p) =>
+        p.map((champ) => (champ.id === selectedChamp ? { ...champ, assigned: true } : champ)),
+      );
+
+      setSelectedChamp(undefined);
     },
-    [cleanSelectedChamp],
+    [selectedChamp],
   );
 
   const handleSelectChampion = useCallback((id: ID) => {
@@ -115,80 +115,47 @@ export function Draft() {
 
   return (
     <div style={{ display: 'flex', columnGap: 20 }}>
-      <div
-        style={{
-          display: 'flex',
-          flexGrow: 3,
-          flexDirection: 'column',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              columnGap: 15,
-            }}
-          >
+      <Draft>
+        <Draft.Top>
+          <Draft.Bans>
             {blueBans.map((slot, index) => (
               <Slot
                 key={index}
                 id={slot}
                 index={index}
-                onAssign={(type, index) => handleAssignChampToSlot(type, index, selectedChamp)}
+                onAssign={handleAssignChampToSlot}
                 onRelease={handleReleaseChampFromSlot}
                 type="blueBan"
               />
             ))}
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              columnGap: 15,
-            }}
-          >
+          </Draft.Bans>
+          <Draft.Bans>
             {redBans.map((slot, index) => (
               <Slot
                 key={index}
                 id={slot}
                 index={index}
-                onAssign={(type, index) => handleAssignChampToSlot(type, index, selectedChamp)}
+                onAssign={handleAssignChampToSlot}
                 onRelease={handleReleaseChampFromSlot}
                 type="redBan"
               />
             ))}
-          </div>
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            columnGap: 15,
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              rowGap: '15px',
-            }}
-          >
+          </Draft.Bans>
+        </Draft.Top>
+        <Draft.Main>
+          <Draft.Picks>
             {bluePicks.map((slot, index) => (
               <Slot
                 key={index}
                 id={slot}
                 index={index}
-                onAssign={(type, index) => handleAssignChampToSlot(type, index, selectedChamp)}
+                onAssign={handleAssignChampToSlot}
                 onRelease={handleReleaseChampFromSlot}
                 type="bluePick"
               />
             ))}
-          </div>
-          <div>
+          </Draft.Picks>
+          <Draft.Pool>
             {pool.map((champ) => (
               <Slot
                 key={champ.id}
@@ -198,35 +165,22 @@ export function Draft() {
                 {...champ}
               />
             ))}
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              rowGap: '15px',
-              flexDirection: 'column',
-            }}
-          >
+          </Draft.Pool>
+          <Draft.Picks>
             {redPicks.map((slot, index) => (
               <Slot
                 key={index}
                 id={slot}
                 index={index}
-                onAssign={(type, index) => handleAssignChampToSlot(type, index, selectedChamp)}
+                onAssign={handleAssignChampToSlot}
                 onRelease={handleReleaseChampFromSlot}
                 type="redPick"
               />
             ))}
-          </div>
-        </div>
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          flexGrow: 2,
-        }}
-      >
-        <SummonersRift redPicks={redPicks} bluePicks={bluePicks} />
-      </div>
+          </Draft.Picks>
+        </Draft.Main>
+      </Draft>
+      <SummonersRift redPicks={redPicks} bluePicks={bluePicks} />
     </div>
   );
 }
