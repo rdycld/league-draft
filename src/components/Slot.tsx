@@ -1,5 +1,5 @@
 import { ID } from '../routes/Draft';
-import { memo } from 'react';
+import React, { memo } from 'react';
 
 export type SlotType = 'redBan' | 'blueBan' | 'redPick' | 'bluePick' | 'pool';
 
@@ -22,18 +22,23 @@ type Props =
 export const Slot = memo(function Slot(props: Props) {
   const { type, id } = props;
 
-  const handleClick = () => {
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
     if (type === 'pool') {
+      if (props.assigned) {
+        return;
+      }
+
       props.onClick(id);
       return;
     }
+
     const { onAssign, onRelease, index } = props;
 
-    //checks for illegal actions {}
-    if (props.id) {
-      //todo fix Prop types
-      onRelease(type, id!);
-    } else {
+    if (id && event.button === 2) {
+      onRelease(type, id);
+    }
+    if (!id) {
       onAssign(type, index);
     }
   };
@@ -41,6 +46,7 @@ export const Slot = memo(function Slot(props: Props) {
   return (
     <div
       onClick={handleClick}
+      onContextMenu={handleClick}
       style={{
         width: 60,
         height: 60,

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { Slot, SlotType } from '../components/Slot';
 import { SummonersRift } from '../components/SummonnersRift';
@@ -80,12 +80,8 @@ export function Draft() {
 
   const handleAssignChampToSlot = useCallback(
     (type: SlotType, index: number, id?: ID) => {
-      //tbf feels hacky xD
-      // better slot props type should fix issue
-      // but for now it works :D
       if (!id) {
-        //todo add assert helper
-        throw new Error('yikes');
+        return;
       }
 
       switch (type) {
