@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Slot, SlotType } from '../components/Slot';
 import { SummonersRift } from '../components/SummonnersRift';
@@ -21,6 +21,17 @@ type Bans = [Ban, Ban, Ban, Ban, Ban];
 export function DraftPage() {
   const [pool, setPool] = useState<DraftChamp[]>(dummyPool);
   const [selectedChamp, setSelectedChamp] = useState<ID>();
+  const [search, setSearch] = useState('');
+
+  const searchPool = useMemo(
+    () =>
+      pool.map((champion) => ({
+        visible: isChampionVisible(champion, search),
+        champion,
+      })),
+
+    [search, pool],
+  );
 
   const [bluePicks, setBluePicks] = useState<Picks>([
     undefined,
@@ -114,7 +125,7 @@ export function DraftPage() {
   }, []);
 
   return (
-    <div style={{ display: 'flex', columnGap: 20 }}>
+    <div style={{ display: 'flex', columnGap: 20, justifyContent: 'center', padding: 40 }}>
       <Draft>
         <Draft.Top>
           <Draft.Bans>
@@ -142,6 +153,7 @@ export function DraftPage() {
             ))}
           </Draft.Bans>
         </Draft.Top>
+        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} />
         <Draft.Main>
           <Draft.Picks>
             {bluePicks.map((slot, index) => (
@@ -156,14 +168,20 @@ export function DraftPage() {
             ))}
           </Draft.Picks>
           <Draft.Pool>
-            {pool.map((champ) => (
-              <Slot
-                key={champ.id}
-                type="pool"
-                onClick={handleSelectChampion}
-                selected={selectedChamp === champ.id}
-                {...champ}
-              />
+            {searchPool.map(({ champion, visible }) => (
+              <div
+                style={{
+                  display: visible ? 'block' : 'none',
+                }}
+                key={champion.id}
+              >
+                <Slot
+                  type="pool"
+                  onClick={handleSelectChampion}
+                  selected={selectedChamp === champion.id}
+                  {...champion}
+                />
+              </div>
             ))}
           </Draft.Pool>
           <Draft.Picks>
@@ -191,6 +209,10 @@ function releaseSlot<T extends Picks | Bans>(slots: T, id: ID) {
 
 function assignToSlot<T extends Picks | Bans>(slots: T, index: number, id: ID) {
   return slots.map((slot, idx) => (idx === index ? id : slot)) as T;
+}
+
+function isChampionVisible(champion: DraftChamp, query: string) {
+  return champion.name.toLowerCase().includes(query.trim().toLowerCase());
 }
 
 const dummyPool = [

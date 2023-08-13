@@ -11,7 +11,7 @@ function Draft({ children }: Props) {
     <div
       style={{
         display: 'flex',
-        flexGrow: 3,
+        width: 1200,
         flexDirection: 'column',
       }}
     >
@@ -75,7 +75,19 @@ function Picks({ children }: CommonProps) {
 }
 
 function Pool({ children }: CommonProps) {
-  return <div>{children}</div>;
+  return (
+    <div
+      style={{
+        display: 'grid',
+        minWidth: 400,
+        gridTemplateColumns: 'repeat(auto-fit, minmax(60px, 1fr))',
+        gridAutoRows: 'min-content',
+        gap: 10,
+      }}
+    >
+      {children}
+    </div>
+  );
 }
 
 Draft.Top = Top;

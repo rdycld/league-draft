@@ -17,6 +17,7 @@ type Props =
       onClick: (id: ID) => void;
       type: Extract<SlotType, 'pool'>;
       selected: boolean;
+      name: string;
     };
 
 export const Slot = memo(function Slot(props: Props) {
