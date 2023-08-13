@@ -1,5 +1,5 @@
 import React, { ElementRef, RefObject, memo, useRef } from 'react';
-import { Shape } from '../App';
+import { Shape } from '../routes/Playground';
 import { Direction, ResizeDot, directions } from './ResizeDot';
 
 export type Props = Shape & {
@@ -51,7 +51,6 @@ export const Rectangle = memo(function Rectangle({
     >
       <p>top: {y}</p>
       <p>left: {x}</p>
-      <p>selected: {'' + selected}</p>
       {Object.keys(directions).map((key) => (
         <ResizeDot key={key} direction={key} visible={selected} onDrag={handleResize} />
       ))}

@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import { Slot, SlotType } from '../components/Slot';
+import { SummonersRift } from '../components/SummonnersRift';
 
 export type ID = Brand<number, 'id'>;
 
@@ -13,7 +14,7 @@ type DraftChamp = {
 type Ban = Brand<number, 'id'> | undefined;
 type Pick = Brand<number, 'id'> | undefined;
 
-type Picks = [Pick, Pick, Pick, Pick, Pick];
+export type Picks = [Pick, Pick, Pick, Pick, Pick];
 type Bans = [Ban, Ban, Ban, Ban, Ban];
 
 export function Draft() {
@@ -117,12 +118,11 @@ export function Draft() {
   }, []);
 
   return (
-    <div style={{ display: 'flex', columnGap: 20, backgroundColor: 'red' }}>
+    <div style={{ display: 'flex', columnGap: 20 }}>
       <div
         style={{
           display: 'flex',
           flexGrow: 3,
-          backgroundColor: 'blue',
           flexDirection: 'column',
         }}
       >
@@ -229,7 +229,7 @@ export function Draft() {
           flexGrow: 2,
         }}
       >
-        summoners rift
+        <SummonersRift redPicks={redPicks} bluePicks={bluePicks} />
       </div>
     </div>
   );
