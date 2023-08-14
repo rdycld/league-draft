@@ -1,8 +1,12 @@
 import { pick } from './pick.ts';
+type DrawOptions = {
+  color?: string;
+  lineWidth?: number;
+};
 export function draw(
   event: React.PointerEvent<HTMLCanvasElement>,
   context: CanvasRenderingContext2D,
-  drawOptions: {},
+  { color = '#000', lineWidth = 2 }: DrawOptions,
 ) {
   let isDrawing = false;
   let cleaned = false;
@@ -10,9 +14,8 @@ export function draw(
   const drawStart = pick(event, ['clientY', 'clientX']);
   const containerOffset = event.currentTarget.getBoundingClientRect();
 
-  //todo - move to drawOptions
-  context.strokeStyle = 'red';
-  context.lineWidth = 1;
+  context.strokeStyle = color;
+  context.lineWidth = lineWidth;
   context.lineCap = 'round';
   context.lineJoin = 'round';
 

@@ -45,37 +45,94 @@ const Champ = memo(function Champ({ id, onDrag, x, y, z }: ChampProps) {
 
 const Canvas = memo(function Canvas() {
   const canvasRef = useRef<ElementRef<'canvas'>>(null);
+  const [color, setColor] = useState('#000');
+  const [lineWidth, setLineWidth] = useState(2);
 
-  const handleDraw = useCallback((event: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!canvasRef.current) {
-      return;
-    }
-
-    const ctx = canvasRef.current.getContext('2d');
-
-    if (!ctx) {
-      return;
-    }
-
-    draw(event, ctx, {});
+  const handleSetColor = useCallback((color: string) => {
+    setColor(color);
   }, []);
 
+  const handleDraw = useCallback(
+    (event: React.PointerEvent<HTMLCanvasElement>) => {
+      if (!canvasRef.current) {
+        return;
+      }
+
+      const ctx = canvasRef.current.getContext('2d');
+
+      if (!ctx) {
+        return;
+      }
+
+      draw(event, ctx, {
+        color,
+        lineWidth,
+      });
+    },
+    [color, lineWidth],
+  );
+
   return (
-    <canvas
-      ref={canvasRef}
-      onPointerDown={handleDraw}
-      style={{
-        left: 0,
-        top: 0,
-        width: 800,
-        height: 800,
-        border: '1px solid red',
-        backgroundImage: 'url(/summoners_rift.png)',
-        backgroundSize: 'contain',
-      }}
-      width={800}
-      height={800}
-    ></canvas>
+    <div>
+      <canvas
+        ref={canvasRef}
+        onPointerDown={handleDraw}
+        style={{
+          left: 0,
+          top: 0,
+          width: 800,
+          height: 800,
+          border: '1px solid red',
+          backgroundImage: 'url(/summoners_rift.png)',
+          backgroundSize: 'contain',
+        }}
+        width={800}
+        height={800}
+      ></canvas>
+      <div
+        style={{
+          display: 'flex',
+          columnGap: 10,
+          alignItems: 'center',
+        }}
+      >
+        <input type="color" onChange={(e) => handleSetColor(e.target.value)} />
+        <input
+          type="range"
+          min={2}
+          max={20}
+          step={2}
+          value={lineWidth}
+          onChange={(e) => setLineWidth(parseInt(e.target.value))}
+        />
+        <button
+          onClick={() => handleSetColor('#000')}
+          style={{ width: 20, cursor: 'pointer', height: 20, backgroundColor: 'black' }}
+        />
+        <button
+          onClick={() => handleSetColor('#00f')}
+          style={{ width: 20, cursor: 'pointer', height: 20, backgroundColor: 'blue' }}
+        />
+        <button
+          onClick={() => handleSetColor('#f00')}
+          style={{ width: 20, cursor: 'pointer', height: 20, backgroundColor: 'red' }}
+        />
+        <button
+          onClick={() => handleSetColor('#0ff')}
+          style={{ width: 20, cursor: 'pointer', height: 20, backgroundColor: 'cyan' }}
+        />
+        <button
+          onClick={() => handleSetColor('#f0f')}
+          style={{ width: 20, cursor: 'pointer', height: 20, backgroundColor: 'magenta' }}
+        />
+        <button
+          onClick={() => handleSetColor('#ff0')}
+          style={{ width: 20, cursor: 'pointer', height: 20, backgroundColor: 'yellow' }}
+        />
+        <button>undo</button>
+        <button> clear</button>
+      </div>
+    </div>
   );
 });
 
