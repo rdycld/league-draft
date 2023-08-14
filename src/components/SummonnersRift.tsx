@@ -3,18 +3,20 @@ import { Picks, type ID } from '../routes/Draft';
 import { DragOptions, calcDrag, drag } from '../utils/drag';
 import { pick } from '../utils/pick';
 import { getDragCoordinates } from '../utils/getDragCoordinates';
+import { draw } from '../utils/draw';
 
 type Coordinates = {
   x: number;
   y: number;
+  z: number;
 };
 
-type DupaProps = Coordinates & {
+type ChampProps = Coordinates & {
   id: ID;
   onDrag: (event: React.MouseEvent<HTMLDivElement>, index: ID) => void;
 };
 
-const Champ = memo(function Champ({ id, onDrag, x, y }: DupaProps) {
+const Champ = memo(function Champ({ id, onDrag, x, y, z }: ChampProps) {
   const rectangleRef = useRef<ElementRef<'div'>>(null);
 
   return (
@@ -23,6 +25,7 @@ const Champ = memo(function Champ({ id, onDrag, x, y }: DupaProps) {
         userSelect: 'none',
         top: y,
         left: x,
+        zIndex: z,
         position: 'absolute',
         border: '2px solid black',
         width: 50,
@@ -40,6 +43,42 @@ const Champ = memo(function Champ({ id, onDrag, x, y }: DupaProps) {
   );
 });
 
+const Canvas = memo(function Canvas() {
+  const canvasRef = useRef<ElementRef<'canvas'>>(null);
+
+  const handleDraw = useCallback((event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!canvasRef.current) {
+      return;
+    }
+
+    const ctx = canvasRef.current.getContext('2d');
+
+    if (!ctx) {
+      return;
+    }
+
+    draw(event, ctx, {});
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      onPointerDown={handleDraw}
+      style={{
+        left: 0,
+        top: 0,
+        width: 800,
+        height: 800,
+        border: '1px solid red',
+        backgroundImage: 'url(/summoners_rift.png)',
+        backgroundSize: 'contain',
+      }}
+      width={800}
+      height={800}
+    ></canvas>
+  );
+});
+
 type Props = {
   redPicks: Picks;
   bluePicks: Picks;
@@ -47,11 +86,12 @@ type Props = {
 
 export function SummonersRift({ redPicks, bluePicks }: Props) {
   const [picks, setPicks] = useState<(Coordinates & { id: ID })[]>([]);
+  const zIndex = useRef(2);
 
   useEffect(() => {
     const newPicks = [
-      ...makeDraggable(bluePicks, { x: 0, y: 700 }),
-      ...makeDraggable(redPicks, { x: 700, y: 0 }),
+      ...makeDraggable(bluePicks, { x: 0, y: 700, z: 1 }),
+      ...makeDraggable(redPicks, { x: 700, y: 0, z: 1 }),
     ];
 
     setPicks((p) => newPicks.map((pick) => p.find((el) => el.id === pick.id) ?? pick));
@@ -80,6 +120,7 @@ export function SummonersRift({ redPicks, bluePicks }: Props) {
               ? {
                   ...pick,
                   ...coordinates,
+                  z: zIndex.current,
                 }
               : pick;
           }),
@@ -88,6 +129,9 @@ export function SummonersRift({ redPicks, bluePicks }: Props) {
 
       drag(event, {
         onDrag,
+        onClean: () => {
+          zIndex.current = zIndex.current + 1;
+        },
         ...options,
       });
     },
@@ -102,13 +146,12 @@ export function SummonersRift({ redPicks, bluePicks }: Props) {
         height: 800,
         border: '1px solid black',
         position: 'relative',
-        backgroundImage: 'url(/summoners_rift.png)',
-        backgroundSize: 'contain',
       }}
     >
       {picks.map((pick) => (
         <Champ key={pick.id} onDrag={handleDrag} {...pick} />
       ))}
+      <Canvas />
     </div>
   );
 }
