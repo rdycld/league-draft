@@ -97,6 +97,7 @@ export function SummonersRift({ redPicks, bluePicks }: Props) {
     <div
       ref={containerRef}
       style={{
+        flexShrink: 0,
         width: 800,
         height: 800,
         border: '1px solid black',
