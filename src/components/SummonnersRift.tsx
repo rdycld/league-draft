@@ -1,9 +1,10 @@
-import { ElementRef, memo, useCallback, useEffect, useRef, useState } from 'react';
+import { ElementRef, RefObject, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { Picks, type ID } from '../routes/Draft';
 import { DragOptions, calcDrag, drag } from '../utils/drag';
 import { pick } from '../utils/pick';
 import { getDragCoordinates } from '../utils/getDragCoordinates';
 import { draw } from '../utils/draw';
+import { assert } from '../utils/assert';
 
 type Coordinates = {
   x: number;
@@ -50,44 +51,51 @@ const Canvas = memo(function Canvas() {
   const canvasRef = useRef<ElementRef<'canvas'>>(null);
   const [color, setColor] = useState('#000');
   const [lineWidth, setLineWidth] = useState(2);
+  const [history, setHistory] = useState<ImageData[]>([]);
 
   const handleSetColor = useCallback((color: string) => {
     setColor(color);
   }, []);
 
+  const addToHistory = (context: CanvasRenderingContext2D) => {
+    setHistory((p) => [...p, context.getImageData(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)]);
+  };
+
   const handleDraw = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
-      if (!canvasRef.current) {
-        return;
-      }
-
-      const ctx = canvasRef.current.getContext('2d');
-
-      if (!ctx) {
-        return;
-      }
+      const ctx = getContext(canvasRef);
 
       draw(event, ctx, {
         color,
         lineWidth,
+        onDrawEnd: addToHistory,
       });
     },
     [color, lineWidth],
   );
 
   const handleClear = () => {
-    if (!canvasRef.current) {
-      return;
-    }
+    const ctx = getContext(canvasRef);
 
-    const ctx = canvasRef.current.getContext('2d');
-
-    if (!ctx) {
-      return;
-    }
     ctx.fillStyle = '#00000000';
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  };
+
+  const handleUndo = () => {
+    if (history.length === 0) {
+      return;
+    }
+
+    if (history.length === 1) {
+      setHistory([]);
+      handleClear();
+      return;
+    }
+    const ctx = getContext(canvasRef);
+
+    ctx.putImageData(history[history.length - 2], 0, 0);
+    setHistory((p) => p.slice(0, p.length - 1));
   };
 
   return (
@@ -103,6 +111,7 @@ const Canvas = memo(function Canvas() {
           border: '2px solid black',
           backgroundImage: 'url(/summoners_rift.png)',
           backgroundSize: 'contain',
+          cursor: 'crosshair',
         }}
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
@@ -147,7 +156,7 @@ const Canvas = memo(function Canvas() {
           onClick={() => handleSetColor('#ff0')}
           style={{ width: 20, cursor: 'pointer', height: 20, backgroundColor: 'yellow' }}
         />
-        <button>undo</button>
+        <button onClick={handleUndo}>undo</button>
         <button onClick={handleClear}> clear</button>
       </div>
     </div>
@@ -229,6 +238,16 @@ export function SummonersRift({ redPicks, bluePicks }: Props) {
       <Canvas />
     </div>
   );
+}
+
+function getContext(ref: RefObject<HTMLCanvasElement>) {
+  assert(ref.current);
+
+  const context = ref.current.getContext('2d');
+
+  assert(context);
+
+  return context;
 }
 
 function makeDraggable(val: Picks, coordinates?: Coordinates) {

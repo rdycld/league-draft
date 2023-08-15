@@ -2,14 +2,19 @@ import { pick } from './pick.ts';
 type DrawOptions = {
   color?: string;
   lineWidth?: number;
+  onDrawEnd?: (ctx: CanvasRenderingContext2D) => void;
 };
 export function draw(
   event: React.PointerEvent<HTMLCanvasElement>,
   context: CanvasRenderingContext2D,
-  { color = '#000', lineWidth = 2 }: DrawOptions,
+  { color = '#000', lineWidth = 2, onDrawEnd }: DrawOptions,
 ) {
   let isDrawing = false;
   let cleaned = false;
+
+  const style = document.createElement('style');
+  style.innerHTML = `* { cursor: crosshair}`;
+  document.head.appendChild(style);
 
   const drawStart = pick(event, ['clientY', 'clientX']);
   const containerOffset = event.currentTarget.getBoundingClientRect();
@@ -40,14 +45,19 @@ export function draw(
   function onPointerUp() {
     clean();
   }
+
   function clean() {
     if (cleaned) {
       return;
     }
     cleaned = true;
+    document.head.removeChild(style);
+
     if (isDrawing) {
       isDrawing = false;
       context.closePath();
+
+      onDrawEnd?.(context);
 
       document.documentElement.removeEventListener('pointermove', onPointerMove);
       document.documentElement.removeEventListener('pointerup', onPointerUp);
