@@ -123,7 +123,7 @@ const Canvas = memo(function Canvas() {
           alignItems: 'center',
         }}
       >
-        <input type="color" onChange={(e) => handleSetColor(e.target.value)} />
+        <input type="color" value={color} onChange={(e) => handleSetColor(e.target.value)} />
         <input
           type="range"
           min={2}
@@ -133,27 +133,27 @@ const Canvas = memo(function Canvas() {
           onChange={(e) => setLineWidth(parseInt(e.target.value))}
         />
         <button
-          onClick={() => handleSetColor('#000')}
+          onClick={() => handleSetColor('#000000')}
           style={{ width: 20, cursor: 'pointer', height: 20, backgroundColor: 'black' }}
         />
         <button
-          onClick={() => handleSetColor('#00f')}
+          onClick={() => handleSetColor('#0000ff')}
           style={{ width: 20, cursor: 'pointer', height: 20, backgroundColor: 'blue' }}
         />
         <button
-          onClick={() => handleSetColor('#f00')}
+          onClick={() => handleSetColor('#ff0000')}
           style={{ width: 20, cursor: 'pointer', height: 20, backgroundColor: 'red' }}
         />
         <button
-          onClick={() => handleSetColor('#0ff')}
+          onClick={() => handleSetColor('#00ffff')}
           style={{ width: 20, cursor: 'pointer', height: 20, backgroundColor: 'cyan' }}
         />
         <button
-          onClick={() => handleSetColor('#f0f')}
+          onClick={() => handleSetColor('#ff00ff')}
           style={{ width: 20, cursor: 'pointer', height: 20, backgroundColor: 'magenta' }}
         />
         <button
-          onClick={() => handleSetColor('#ff0')}
+          onClick={() => handleSetColor('#ffff00')}
           style={{ width: 20, cursor: 'pointer', height: 20, backgroundColor: 'yellow' }}
         />
         <button onClick={handleUndo}>undo</button>
