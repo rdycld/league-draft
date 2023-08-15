@@ -13,6 +13,8 @@ function Draft({ children }: Props) {
         display: 'flex',
         width: 1200,
         flexDirection: 'column',
+        alignItems: 'center',
+        rowGap: 30,
       }}
     >
       {children}
@@ -25,6 +27,7 @@ function Top({ children }: CommonProps) {
     <div
       style={{
         display: 'flex',
+        width: '100%',
         justifyContent: 'space-between',
       }}
     >
@@ -39,7 +42,7 @@ function Main({ children }: CommonProps) {
       style={{
         display: 'flex',
         justifyContent: 'center',
-        columnGap: 15,
+        columnGap: 35,
       }}
     >
       {children}
@@ -79,10 +82,12 @@ function Pool({ children }: CommonProps) {
     <div
       style={{
         display: 'grid',
-        minWidth: 400,
-        gridTemplateColumns: 'repeat(auto-fit, minmax(60px, 1fr))',
+        minWidth: 560,
+        gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
         gridAutoRows: 'min-content',
         gap: 10,
+        maxHeight: 800,
+        overflow: 'auto',
       }}
     >
       {children}

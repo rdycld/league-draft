@@ -1,5 +1,5 @@
 import { ID } from '../routes/Draft';
-import React, { memo } from 'react';
+import React, { Children, memo } from 'react';
 
 export type SlotType = 'redBan' | 'blueBan' | 'redPick' | 'bluePick' | 'pool';
 
@@ -10,6 +10,7 @@ type Props =
       onAssign: (type: SlotType, index: number) => void;
       type: Exclude<SlotType, 'pool'>;
       index: number;
+      children?: string;
     }
   | {
       id: ID;
@@ -18,10 +19,11 @@ type Props =
       type: Extract<SlotType, 'pool'>;
       selected: boolean;
       name: string;
+      children?: string;
     };
 
 export const Slot = memo(function Slot(props: Props) {
-  const { type, id } = props;
+  const { type, id, children } = props;
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -49,15 +51,43 @@ export const Slot = memo(function Slot(props: Props) {
       onClick={handleClick}
       onContextMenu={handleClick}
       style={{
-        width: 60,
-        height: 60,
-        border: '2px solid black',
-        borderColor:
-          (type === 'pool' && (props.assigned ? 'red' : props.selected ? 'green' : 'black')) ||
-          'black',
+        width: 80,
+        height: 100,
+        display: 'flex',
+        flexDirection: 'column',
+        cursor: 'pointer',
       }}
     >
-      {id}
+      <div
+        style={{
+          height: 80,
+          width: 80,
+          border: '2px solid black',
+          backgroundColor: '#222',
+          borderColor:
+            (type === 'pool' && (props.assigned ? 'red' : props.selected ? 'green' : 'black')) ||
+            'black',
+          filter:
+            (type === 'pool' && props.assigned) || type === 'redBan' || type === 'blueBan'
+              ? 'grayscale(1)'
+              : 'none',
+          backgroundImage: props.id && 'url(https://picsum.photos/80)',
+        }}
+      >
+        {id}
+      </div>
+      <div
+        style={{
+          height: 20,
+          justifySelf: 'center',
+          textAlign: 'center',
+          textOverflow: 'ellipsis',
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 });

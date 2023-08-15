@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Slot, SlotType } from '../components/Slot';
 import { SummonersRift } from '../components/SummonnersRift';
 import { Draft } from '../components/Draft';
+import { CHAMPIONS } from '../generated';
 
 export type ID = Brand<number, 'id'>;
 
@@ -19,7 +20,7 @@ export type Picks = [Pick, Pick, Pick, Pick, Pick];
 type Bans = [Ban, Ban, Ban, Ban, Ban];
 
 export function DraftPage() {
-  const [pool, setPool] = useState<DraftChamp[]>(dummyPool);
+  const [pool, setPool] = useState<DraftChamp[]>(championsPool);
   const [selectedChamp, setSelectedChamp] = useState<ID>();
   const [search, setSearch] = useState('');
 
@@ -125,7 +126,14 @@ export function DraftPage() {
   }, []);
 
   return (
-    <div style={{ display: 'flex', columnGap: 20, justifyContent: 'center', padding: 40 }}>
+    <div
+      style={{
+        display: 'flex',
+        columnGap: 20,
+        justifyContent: 'center',
+        padding: 40,
+      }}
+    >
       <Draft>
         <Draft.Top>
           <Draft.Bans>
@@ -137,7 +145,9 @@ export function DraftPage() {
                 onAssign={handleAssignChampToSlot}
                 onRelease={handleReleaseChampFromSlot}
                 type="blueBan"
-              />
+              >
+                {`B${index + 1}`}
+              </Slot>
             ))}
           </Draft.Bans>
           <Draft.Bans>
@@ -149,11 +159,30 @@ export function DraftPage() {
                 onAssign={handleAssignChampToSlot}
                 onRelease={handleReleaseChampFromSlot}
                 type="redBan"
-              />
+              >
+                {`B${index + 1}`}
+              </Slot>
             ))}
           </Draft.Bans>
         </Draft.Top>
-        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} />
+        <div
+          style={{
+            width: 600,
+            height: 30,
+          }}
+        >
+          <input
+            style={{
+              width: '100%',
+              height: '100%',
+              fontSize: 18,
+            }}
+            type="text"
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
         <Draft.Main>
           <Draft.Picks>
             {bluePicks.map((slot, index) => (
@@ -164,7 +193,9 @@ export function DraftPage() {
                 onAssign={handleAssignChampToSlot}
                 onRelease={handleReleaseChampFromSlot}
                 type="bluePick"
-              />
+              >
+                {`B${index + 1}`}
+              </Slot>
             ))}
           </Draft.Picks>
           <Draft.Pool>
@@ -180,7 +211,9 @@ export function DraftPage() {
                   onClick={handleSelectChampion}
                   selected={selectedChamp === champion.id}
                   {...champion}
-                />
+                >
+                  {champion.name}
+                </Slot>
               </div>
             ))}
           </Draft.Pool>
@@ -193,7 +226,9 @@ export function DraftPage() {
                 onAssign={handleAssignChampToSlot}
                 onRelease={handleReleaseChampFromSlot}
                 type="redPick"
-              />
+              >
+                {`R${index + 1}`}
+              </Slot>
             ))}
           </Draft.Picks>
         </Draft.Main>
@@ -215,55 +250,4 @@ function isChampionVisible(champion: DraftChamp, query: string) {
   return champion.name.toLowerCase().includes(query.trim().toLowerCase());
 }
 
-const dummyPool = [
-  {
-    name: 'aatrox',
-    id: 1,
-    assigned: false,
-  },
-  {
-    name: 'ahri',
-    id: 2,
-    assigned: false,
-  },
-  {
-    name: 'lucian',
-    id: 3,
-    assigned: false,
-  },
-  {
-    name: 'braum',
-    id: 4,
-    assigned: false,
-  },
-  {
-    name: 'kogmaw',
-    id: 5,
-    assigned: false,
-  },
-  {
-    name: 'anivia',
-    id: 13,
-    assigned: false,
-  },
-  {
-    name: 'blitzcrank',
-    id: 10,
-    assigned: false,
-  },
-  {
-    name: 'evelynn',
-    id: 123,
-    assigned: false,
-  },
-  {
-    name: 'kogmaw',
-    id: 199,
-    assigned: false,
-  },
-  {
-    name: 'zeri',
-    id: 210,
-    assigned: false,
-  },
-] as DraftChamp[];
+const championsPool = CHAMPIONS.map(({ id, name }) => ({ id: id as ID, name, assigned: false }));

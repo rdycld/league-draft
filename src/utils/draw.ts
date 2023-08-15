@@ -47,6 +47,7 @@ export function draw(
     cleaned = true;
     if (isDrawing) {
       isDrawing = false;
+      context.closePath();
 
       document.documentElement.removeEventListener('pointermove', onPointerMove);
       document.documentElement.removeEventListener('pointerup', onPointerUp);

@@ -43,6 +43,9 @@ const Champ = memo(function Champ({ id, onDrag, x, y, z }: ChampProps) {
   );
 });
 
+const CANVAS_WIDTH = 800 as const;
+const CANVAS_HEIGHT = 800 as const;
+
 const Canvas = memo(function Canvas() {
   const canvasRef = useRef<ElementRef<'canvas'>>(null);
   const [color, setColor] = useState('#000');
@@ -72,6 +75,21 @@ const Canvas = memo(function Canvas() {
     [color, lineWidth],
   );
 
+  const handleClear = () => {
+    if (!canvasRef.current) {
+      return;
+    }
+
+    const ctx = canvasRef.current.getContext('2d');
+
+    if (!ctx) {
+      return;
+    }
+    ctx.fillStyle = '#00000000';
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  };
+
   return (
     <div>
       <canvas
@@ -80,14 +98,14 @@ const Canvas = memo(function Canvas() {
         style={{
           left: 0,
           top: 0,
-          width: 800,
-          height: 800,
-          border: '1px solid red',
+          width: CANVAS_WIDTH,
+          height: CANVAS_HEIGHT,
+          border: '2px solid black',
           backgroundImage: 'url(/summoners_rift.png)',
           backgroundSize: 'contain',
         }}
-        width={800}
-        height={800}
+        width={CANVAS_WIDTH}
+        height={CANVAS_HEIGHT}
       ></canvas>
       <div
         style={{
@@ -130,7 +148,7 @@ const Canvas = memo(function Canvas() {
           style={{ width: 20, cursor: 'pointer', height: 20, backgroundColor: 'yellow' }}
         />
         <button>undo</button>
-        <button> clear</button>
+        <button onClick={handleClear}> clear</button>
       </div>
     </div>
   );
@@ -187,7 +205,7 @@ export function SummonersRift({ redPicks, bluePicks }: Props) {
       drag(event, {
         onDrag,
         onClean: () => {
-          zIndex.current = zIndex.current + 1;
+          zIndex.current += 1;
         },
         ...options,
       });
