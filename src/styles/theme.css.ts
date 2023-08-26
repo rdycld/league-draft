@@ -3,32 +3,80 @@ import { createTheme, createVar } from '@vanilla-extract/css';
 export { flatPalette, themes };
 export type { Theme };
 
+
+
 const [lightTheme, palette] = createTheme({
-  primary: {
-    default: '#1445F5',
-    hover: '#436AF7',
-    focus: '#728FF9',
-    disabled: '#D3D4D5',
-    inverted: {
-      default: '#E8ECFE',
-      focus: '#A1B5FB',
+  background: {
+    neutral: {
+      primary: '#FFFFFF',
+      secondary: '#FAFAFA',
+      tertiary: '#F5F5F5',
+      muted: '#D4D4D4',
+      inverse: '#0A0A0A',
+    },
+    accent: {
+      default: '600',
+      pressed: '800',
+      disabled: '200',
+    },
+    success: {
+      highContrast: '600',
+      lowContrast: '50',
+    },
+    warning: {
+      highContrast: '600',
+      lowContrast: '50',
+    },
+    error: {
+      highContrast: '600',
+      lowContrast: '50',
     },
   },
-  background: {
-    primary: '#FFFFFF',
-    secondary: '#F6F7F7',
-    tertiary: '#EAEAEB',
-    quarternary: '#AAABAE',
-    inverted: '#070809',
-    disabled: '#D3D4D5',
+  foreground: {
+    neutral: {
+      primary: '1000',
+      secondary: '700',
+      muted: '400',
+      onColor: '0',
+    },
+    accent: {
+      primary: '800',
+      secondary: '600',
+      muted: '400',
+      onColor: '100',
+    },
+    success: {
+      primary: '800',
+      secondary: '600',
+      onColor: '100',
+    },
+    warning: {
+      primary: '800',
+      secondary: '600',
+      onColor: '100',
+    },
+    error: {
+      primary: '800',
+      secondary: '600',
+      onColor: '100',
+    },
   },
   border: {
-    ui: '#AAABAE',
-    layout: '#EAEAEB',
-    active: '#1445F5',
-    focus: '#A1B5FB',
-    error: '#DE3672',
+    default: '',
+    subtle: '',
+    focus: '',
+    accent: {
+      default: '',
+      subtle: '',
+      dark: '',
+    },
+    system: {
+      success: '',
+      error: '',
+      warning: '',
+    },
   },
+
   text: {
     primary: '#070809',
     secondary: '#636669',
@@ -37,16 +85,6 @@ const [lightTheme, palette] = createTheme({
     link: '#1445F5',
     disabled: '#929497',
     error: '#B22B5B',
-  },
-  success: {
-    default: '#27D09D',
-    hover: '#52D9B1',
-    focus: '#7DE3C4',
-  },
-  error: {
-    default: '#DE3672',
-    hover: '#E55E8E',
-    focus: '#EB86AA',
   },
   gray: {
     '1': '#333333',
@@ -71,49 +109,85 @@ const [lightTheme, palette] = createTheme({
 });
 
 const darkTheme = createTheme(palette, {
-  primary: {
-    default: '#0C2993',
-    hover: '#0C2993',
-    focus: '#1445F5',
-    disabled: '#2A2E34',
-    inverted: {
-      default: '#040E31',
-      focus: '#0C2993',
+  background: {
+    neutral: {
+      primary: '#FFFFFF',
+      secondary: '#F6F7F7',
+      tertiary: '#EAEAEB',
+      muted: '#AAABAE',
+      inverse: '#070809',
+    },
+    accent: {
+      default: '',
+      pressed: '',
+      disabled: '',
+    },
+    success: {
+      highContrast: '#27D09D',
+      lowContrast: '#52D9B1',
+    },
+    warning: {
+      highContrast: '#27D09D',
+      lowContrast: '#52D9B1',
+    },
+    error: {
+      highContrast: '#27D09D',
+      lowContrast: '#52D9B1',
     },
   },
-  background: {
-    primary: '#08090A',
-    secondary: '#191C1F',
-    tertiary: '#22252A',
-    quarternary: '#2A2E34',
-    inverted: '#F6F7F7',
-    disabled: '#2A2E34',
+  foreground: {
+    neutral: {
+      primary: '#FFFFFF',
+      secondary: '#F6F7F7',
+      muted: '#AAABAE',
+      onColor: '#070809',
+    },
+    accent: {
+      primary: '',
+      secondary: '',
+      muted: '',
+      onColor: '',
+    },
+    success: {
+      primary: '#27D09D',
+      secondary: '#52D9B1',
+      onColor: '',
+    },
+    warning: {
+      primary: '#27D09D',
+      secondary: '#52D9B1',
+      onColor: '',
+    },
+    error: {
+      primary: '#27D09D',
+      secondary: '#52D9B1',
+      onColor: '',
+    },
   },
   border: {
-    ui: '#22252A',
-    layout: '#191C1F',
-    active: '#1445F5',
-    focus: '#436AF7',
-    error: '#DE3672',
+    default: '',
+    subtle: '',
+    focus: '',
+    accent: {
+      default: '',
+      subtle: '',
+      dark: '',
+    },
+    system: {
+      success: '',
+      error: '',
+      warning: '',
+    },
   },
+
   text: {
-    primary: '#FFFFFF',
-    secondary: '#D3D4D5',
-    tertiary: '#BEBFC0',
-    label: '#E9EAEA',
-    link: '#728FF9',
-    disabled: '#636669',
-    error: '#DE3672',
-  },
-  success: {
-    default: '#27D09D',
-    hover: '#52D9B1',
-    focus: '#7DE3C4',
-  },
-  error: {
-    default: '#DE3672',
-    hover: '#B22B5B',
-    focus: '#852044',
+    primary: '#070809',
+    secondary: '#636669',
+    tertiary: '#7C7F82',
+    label: '#FFFFFF',
+    link: '#1445F5',
+    disabled: '#929497',
+    error: '#B22B5B',
   },
   gray: {
     '1': '#333333',
@@ -176,4 +250,3 @@ export const mediaQuery = {
 } as const;
 
 export const basicTransition = 'all 150ms linear';
-

@@ -38,6 +38,7 @@ export function Playground() {
 
       const onDrag = (event: PointerEvent) => {
         const drag = calcDrag(event, initialPoint);
+        console.log(drag);
 
         const coordinates = getDragCoordinates(rectangle, container, drag);
 
